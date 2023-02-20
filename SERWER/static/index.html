@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap");
+        /*Noto sans*/
+
+        body {
+            font-family: "Noto Sans", sans-serif;
+            padding: 0%;
+            margin: 0%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #dropBox {
+            background-color: rgb(100, 187, 187);
+            width: 100%;
+            height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 8rem;
+            color: rgb(140, 204, 204);
+        }
+
+        #dropBox:hover {
+            cursor: pointer;
+            background-color: rgb(87, 207, 207);
+            color: rgb(110, 160, 160);
+        }
+
+        .img {
+            height: 150px;
+            width: 150px;
+        }
+
+        h1 {
+            font-size: 5rem;
+        }
+
+        #allSended {
+            font-size: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Admin Page</h1>
+    <div id="dropBox">DRAG HERE</div>
+    <div id="allSended">
+
+    </div>
+    <script>
+        const dropArea = document.getElementById("dropBox");
+        const allSended = document.getElementById("allSended");
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(
+            eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false)
+            })
+
+        function preventDefaults(e) {
+            e.preventDefault()
+            e.stopPropagation()
+        }
+
+        dropArea.addEventListener('drop', dropOption, false)
+
+        function dropOption(e) {
+            let data = e.dataTransfer;
+            let files = data.files;
+            uploadFile(files)
+        }
+        const allIcons = ['aac.png', 'ace.png', 'ai.png', 'aut.png', 'avi.png', 'bin.png', 'bmp.png', 'cad.png',
+            'cdr.png', 'css.png', 'db.png', 'dmg.png', 'doc.png', 'docx.png', 'dwf.png', 'dwg.png', 'eps.png',
+            'exe.png', 'flac.png', 'gif.png', 'hlp.png', 'htm.png', 'html.png', 'ini.png', 'iso.png', 'java.png',
+            'jpg.png', 'js.png', 'mkv.png', 'mov.png', 'mp3.png', 'mp4.png', 'mpg.png', 'pdf.png', 'php.png',
+            'png.png', 'ppt.png', 'ps.png', 'psd.png', 'rar.png', 'rss.png', 'rtf.png', 'svg.png', 'swf.png',
+            'sys.png', 'tiff.png', 'txt.png', 'xls.png', 'xlsx.png', 'zip.png'
+        ]
+
+        function uploadFile(file) {
+            let url = '/uploadFiles'
+            let formData = new FormData()
+            for (i = 0; i < file.length; i++) {
+                formData.append('file', file[i])
+            }
+            fetch(url, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then((data) => {
+                    data.json().then(function (text) {
+                        allSended.innerHTML = ''
+                        text.forEach(item => {
+                            var div = document.createElement("div")
+                            var a = document.createElement("a")
+                            var img = document.createElement("img")
+                            var icon = getType(item)
+
+                            img.classList += "img"
+                            img.src = icon
+                            a.innerText = item
+
+                            div.append(img)
+                            div.append(a)
+
+                            allSended.append(div)
+                            console.log(item)
+                        })
+                    })
+                })
+                .catch(() => {
+
+                })
+        }
+
+        function getType(item) {
+            for (ele of allIcons) {
+                var element = ele.split(".")
+                if (item.substring(item.length - 3, item.length) == element[0]) {
+                    return ("/img/" + ele)
+                }
+            }
+            return ("/img/unknow.png")
+        }
+    </script>
+</body>
+
+</html>
